@@ -1,5 +1,7 @@
 # burnmeter
 
+[![test](https://github.com/hieu10x/burnmeter/actions/workflows/test.yml/badge.svg)](https://github.com/hieu10x/burnmeter/actions/workflows/test.yml) [![npm](https://img.shields.io/npm/v/burnmeter)](https://www.npmjs.com/package/burnmeter)
+
 See what your AI coding tools cost, per day, model, project and session, from the logs already on your machine.
 
 ```
