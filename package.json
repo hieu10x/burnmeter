@@ -1,0 +1,15 @@
+{
+  "name": "burnmeter",
+  "version": "0.1.0",
+  "description": "See what your AI coding tools (Claude Code, Codex) cost per day, model, project and session — locally, from the logs already on your machine.",
+  "type": "module",
+  "bin": { "burnmeter": "src/cli.js" },
+  "files": ["src", "README.md", "LICENSE"],
+  "engines": { "node": ">=20" },
+  "scripts": { "test": "node --test" },
+  "repository": { "type": "git", "url": "git+https://github.com/hieu10x/burnmeter.git" },
+  "homepage": "https://github.com/hieu10x/burnmeter#readme",
+  "keywords": ["claude-code", "codex", "ai", "cost", "tokens", "usage", "finops", "developer-tools"],
+  "license": "MIT",
+  "author": "Hieu Tran"
+}
