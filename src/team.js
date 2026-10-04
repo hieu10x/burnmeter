@@ -1,6 +1,7 @@
 // Team roll-up: each developer exports a small anonymised summary; a lead merges them.
 // No prompts, code, file paths or raw logs ever leave the machine. Project names are
-// hashed unless --include-projects is passed.
+// replaced by keyed hashes (random key per export, never stored) unless --include-projects
+// is passed, so they can't be recovered by hashing guessed names.
 
 import crypto from "node:crypto";
 import fs from "node:fs";
@@ -20,6 +21,8 @@ const round = (n) => Math.round(n * 100) / 100;
 const totals = (g) => ({ cost: round(g.cost), requests: g.requests, input: g.input, output: g.output, cache_read: g.cacheRead, cache_write: g.cacheWrite });
 
 export function buildExport(summary, { since, until, developer, includeProjects }) {
+  const key = crypto.randomBytes(32);
+  const anon = (name) => "p-" + crypto.createHmac("sha256", key).update(name).digest("hex").slice(0, 8);
   return {
     schema: SCHEMA,
     generated: new Date().toISOString(),
@@ -30,7 +33,7 @@ export function buildExport(summary, { since, until, developer, includeProjects 
     total: totals(summary.total),
     by_day: summary.byDay.map((d) => ({ day: d.key, cost: round(d.cost) })),
     by_model: summary.byModel.map((m) => ({ model: m.key, ...totals(m) })),
-    by_project: summary.byProject.map((p) => ({ project: includeProjects ? p.key : "p-" + short(p.key), cost: round(p.cost) })),
+    by_project: summary.byProject.map((p) => ({ project: includeProjects ? p.key : anon(p.key), cost: round(p.cost) })),
     alerts: {
       session_threshold: summary.alerts.sessionAlert,
       sessions_over: summary.alerts.sessions.length,

@@ -10,7 +10,7 @@ import { readCodex } from "./sources/codex.js";
 import { summarize, render } from "./report.js";
 import { buildExport, defaultDeveloperId, readExports, renderMerge } from "./team.js";
 
-const VERSION = "0.1.0";
+const VERSION = "0.1.1";
 const CTA = "Rolling this up across a team, with alerts and caps before the bill? Early access: https://burnmeter.pages.dev/?utm_source=cli&utm_medium=terminal";
 
 const HELP = `burnmeter ${VERSION}: what your AI coding tools would cost at API prices
@@ -32,6 +32,7 @@ Options
   --as NAME              developer label in the export (default: anonymous hash)
   --include-projects     keep project names in the export (hashed by default)
   --no-color             plain output
+  --no-cta               hide the one-line early-access note
   -v, --version / -h, --help
 
 Reads ~/.claude/projects (or $CLAUDE_CONFIG_DIR) and ~/.codex/sessions (or $CODEX_HOME).
@@ -60,6 +61,7 @@ export async function main(argv = process.argv.slice(2), io = { out: console.log
       as: { type: "string" },
       "include-projects": { type: "boolean", default: false },
       "no-color": { type: "boolean", default: false },
+      "no-cta": { type: "boolean", default: false },
       version: { type: "boolean", short: "v" },
       help: { type: "boolean", short: "h" },
     },
@@ -97,7 +99,7 @@ export async function main(argv = process.argv.slice(2), io = { out: console.log
     io.err(`wrote ${o.export} (${exp.developer}, ${exp.total.requests} requests, $${exp.total.cost}). Share it with your lead; they run: npx burnmeter merge *.json`);
   }
   if (o.json) return io.out(JSON.stringify(buildExport(s, { since, until, developer: o.as || defaultDeveloperId(), includeProjects: true }), null, 2));
-  if (!o.export) io.out(render(s, { since, until, color, days: num("days"), cta: CTA }));
+  if (!o.export) io.out(render(s, { since, until, color, days: num("days"), cta: o["no-cta"] || process.env.BURNMETER_NO_CTA ? undefined : CTA }));
 }
 
 const isMain = process.argv[1] && fs.realpathSync(process.argv[1]) === fs.realpathSync(fileURLToPath(import.meta.url));

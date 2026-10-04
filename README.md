@@ -54,7 +54,7 @@ Each developer:
 npx burnmeter --export alice.json --as alice
 ```
 
-The export holds daily totals, per-model totals and alert counts. It contains **no prompts, code, file paths or raw logs**, and project names are hashed unless you pass `--include-projects`.
+The export holds daily totals, per-model totals and alert counts. It contains **no prompts, code, file paths or raw logs**, and project names are replaced by keyed hashes (a random key per export, never saved) unless you pass `--include-projects`.
 
 The lead:
 
@@ -72,6 +72,7 @@ npx burnmeter merge *.json
 --json                         machine-readable output
 --export FILE [--as NAME]      anonymised team summary
 --no-color
+--no-cta                       hide the one-line early-access note (or set BURNMETER_NO_CTA=1)
 ```
 
 ## Privacy

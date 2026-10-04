@@ -162,3 +162,26 @@ test("cli: --json works and bad dates are rejected", async () => {
   assert.equal(j.schema, "burnmeter.team/1");
   await assert.rejects(main(["--since", "01/10/2026"], { out() {}, err() {} }), /YYYY-MM-DD/);
 });
+
+test("cli: early-access line shows by default and --no-cta hides it", async () => {
+  const cfg = tmp();
+  fs.mkdirSync(path.join(cfg, "projects", "p"), { recursive: true });
+  fs.writeFileSync(path.join(cfg, "projects", "p", "s.jsonl"), jsonl([claudeLine({ usage: u({ output_tokens: 1e3 }) })]));
+  process.env.CLAUDE_CONFIG_DIR = cfg;
+  process.env.CODEX_HOME = tmp();
+  const run = async (extra) => {
+    const out = [];
+    await main(["--no-color", "--since", "2026-10-01", "--until", "2026-10-01", ...extra], { out: (s) => out.push(s), err: () => {} });
+    return out.join("\n");
+  };
+  assert.match(await run([]), /burnmeter\.pages\.dev/);
+  assert.doesNotMatch(await run(["--no-cta"]), /burnmeter\.pages\.dev/);
+});
+
+test("export project hashes are keyed per export, so guessed names can't be matched", async () => {
+  const s = summarize([]);
+  s.byProject = [{ key: "api-server", cost: 1 }];
+  const range = { since: new Date("2026-10-01"), until: new Date("2026-10-02") };
+  const a = buildExport(s, { ...range, developer: "a" }), b = buildExport(s, { ...range, developer: "b" });
+  assert.notEqual(a.by_project[0].project, b.by_project[0].project);
+});
